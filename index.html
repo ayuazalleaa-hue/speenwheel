@@ -28,9 +28,7 @@
       text-transform: uppercase;
     }
 
-    h1 span {
-      color: #EF9F27;
-    }
+    h1 span { color: #EF9F27; }
 
     .wheel-section {
       display: flex;
@@ -90,14 +88,8 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.5);
     }
 
-    .spin-btn:active:not(:disabled) {
-      transform: translate(-50%, -50%) scale(0.97);
-    }
-
-    .spin-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .spin-btn:active:not(:disabled) { transform: translate(-50%, -50%) scale(0.97); }
+    .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .result-box {
       background: rgba(255,255,255,0.05);
@@ -132,7 +124,6 @@
       <canvas id="wheel" width="420" height="420"></canvas>
       <button class="spin-btn" id="spinBtn">SPIN</button>
     </div>
-
     <div class="result-box">
       <div id="resultText">Tekan SPIN untuk mulai</div>
       <div class="spin-count" id="spinCount">Sisa spin: 5</div>
@@ -140,38 +131,38 @@
   </div>
 
   <script>
-   const rawSlots = [
-      { label: "Meowl Gold", tier: 0, chance: 4.93 },
-      { label: "Meowl Diamond", tier: 1, chance: 4.43 },
-      { label: "Meowl Plasma", tier: 2, chance: 2.5 },
-      { label: "Meowl Molten", tier: 3, chance: 2 },
-      { label: "Strawberry Ele Gold", tier: 0, chance: 4.93 },
-      { label: "Strawberry Ele Diamond", tier: 1, chance: 4.43 },
-      { label: "Strawberry Ele Plasma", tier: 2, chance: 2.5 },
-      { label: "Strawberry Ele Molten", tier: 3, chance: 2 },
-      { label: "Dolphin Gold", tier: 0, chance: 4.93 },
-      { label: "Dolphin Diamond", tier: 1, chance: 4.43 },
-      { label: "Dolphin Plasma", tier: 2, chance: 2.5 },
-      { label: "Dolphin Molten", tier: 3, chance: 2 },
-      { label: "Digitale Gold", tier: 0, chance: 4.93 },
-      { label: "Digitale Diamond", tier: 1, chance: 4.43 },
-      { label: "Digitale Plasma", tier: 2, chance: 2.5 },
-      { label: "Digitale Molten", tier: 3, chance: 2 },
-      { label: "Chicleteira Gold", tier: 0, chance: 4.93 },
-      { label: "Chicleteira Diamond", tier: 1, chance: 4.43 },
-      { label: "Chicleteira Plasma", tier: 2, chance: 2.5 },
-      { label: "Chicleteira Molten", tier: 3, chance: 2 },
-      { label: "Hotspot Gold", tier: 0, chance: 4.93 },
-      { label: "Hotspot Diamond", tier: 1, chance: 4.43 },
-      { label: "Hotspot Plasma", tier: 2, chance: 2.5 },
-      { label: "Hotspot Molten", tier: 3, chance: 2 },
-      { label: "Krupuk Gold", tier: 0, chance: 4.93 },
-      { label: "Krupuk Diamond", tier: 1, chance: 4.43 },
-      { label: "Krupuk Plasma", tier: 2, chance: 2.5 },
-      { label: "Krupuk Molten", tier: 3, chance: 2 },
-      { label: "Disc 1B/1.5K 8B/10K", tier: 1, chance: 1.5 },
-      { label: "Disc 1B/2K 8B/14K", tier: 2, chance: 1 },
-      { label: "1 Lucky Block Cup", tier: 3, chance: 0.5 },
+    const rawSlots = [
+      { label: "Meowl Gold",            tier: 0, chance: 4.93 },
+      { label: "Meowl Diamond",         tier: 1, chance: 4.43 },
+      { label: "Meowl Plasma",          tier: 2, chance: 2.5  },
+      { label: "Meowl Molten",          tier: 3, chance: 2    },
+      { label: "Strawberry Ele Gold",   tier: 0, chance: 4.93 },
+      { label: "Strawberry Ele Diamond",tier: 1, chance: 4.43 },
+      { label: "Strawberry Ele Plasma", tier: 2, chance: 2.5  },
+      { label: "Strawberry Ele Molten", tier: 3, chance: 2    },
+      { label: "Dolphin Gold",          tier: 0, chance: 4.93 },
+      { label: "Dolphin Diamond",       tier: 1, chance: 4.43 },
+      { label: "Dolphin Plasma",        tier: 2, chance: 2.5  },
+      { label: "Dolphin Molten",        tier: 3, chance: 2    },
+      { label: "Digitale Gold",         tier: 0, chance: 4.93 },
+      { label: "Digitale Diamond",      tier: 1, chance: 4.43 },
+      { label: "Digitale Plasma",       tier: 2, chance: 2.5  },
+      { label: "Digitale Molten",       tier: 3, chance: 2    },
+      { label: "Chicleteira Gold",      tier: 0, chance: 4.93 },
+      { label: "Chicleteira Diamond",   tier: 1, chance: 4.43 },
+      { label: "Chicleteira Plasma",    tier: 2, chance: 2.5  },
+      { label: "Chicleteira Molten",    tier: 3, chance: 2    },
+      { label: "Hotspot Gold",          tier: 0, chance: 4.93 },
+      { label: "Hotspot Diamond",       tier: 1, chance: 4.43 },
+      { label: "Hotspot Plasma",        tier: 2, chance: 2.5  },
+      { label: "Hotspot Molten",        tier: 3, chance: 2    },
+      { label: "Krupuk Gold",           tier: 0, chance: 4.93 },
+      { label: "Krupuk Diamond",        tier: 1, chance: 4.43 },
+      { label: "Krupuk Plasma",         tier: 2, chance: 2.5  },
+      { label: "Krupuk Molten",         tier: 3, chance: 2    },
+      { label: "Disc 1B/1.5K 8B/10K",  tier: 4, chance: 1.5  },
+      { label: "Disc 1B/2K 8B/14K",    tier: 5, chance: 1    },
+      { label: "1 Lucky Block Cup",     tier: 6, chance: 0.5  },
     ];
 
     function shuffle(arr) {
@@ -187,14 +178,34 @@
     const N = slots.length;
     const arcSize = (2 * Math.PI) / N;
 
+    // tier 0=Gold, 1=Diamond, 2=Plasma, 3=Molten, 4=Disc murah, 5=Disc mahal, 6=Lucky Block
     const tierColors = [
-      ["#5DCAA5", "#1D9E75"],
-      ["#378ADD", "#185FA5"],
-      ["#D4537E", "#993556"],
-      ["#EF9F27", "#BA7517"],
+      ["#5DCAA5", "#1D9E75"],         // Gold - hijau
+      ["#378ADD", "#185FA5"],         // Diamond - biru
+      ["#D4537E", "#993556"],         // Plasma - pink
+      ["#EF9F27", "#BA7517"],         // Molten - amber
+      ["#00E5FF", "#00ACC1"],         // Disc murah - cyan terang
+      ["#CE93D8", "#9C27B0"],         // Disc mahal - ungu terang
+      ["#FFD700", "#FF8C00"],         // Lucky Block - emas
     ];
-    const tierText = ["#04342C", "#042C53", "#4B1528", "#412402"];
-    const tierResultColor = ["#5DCAA5", "#378ADD", "#D4537E", "#EF9F27"];
+
+    const tierText = [
+      "#04342C", "#042C53", "#4B1528", "#412402",
+      "#001F26", "#1A0030", "#3B2000",
+    ];
+
+    const tierResultColor = [
+      "#5DCAA5", "#378ADD", "#D4537E", "#EF9F27",
+      "#00E5FF", "#CE93D8", "#FFD700",
+    ];
+
+    // glow color per tier (hanya tier 4,5,6)
+    const tierGlow = [
+      null, null, null, null,
+      "rgba(0,229,255,0.7)",
+      "rgba(206,147,216,0.8)",
+      "rgba(255,215,0,0.9)",
+    ];
 
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
@@ -217,14 +228,12 @@
         const ac = getAudio();
         const osc = ac.createOscillator();
         const gain = ac.createGain();
-        osc.connect(gain);
-        gain.connect(ac.destination);
+        osc.connect(gain); gain.connect(ac.destination);
         osc.frequency.value = 280 + Math.min(speed * 900, 900);
         osc.type = "triangle";
         gain.gain.setValueAtTime(0.15, ac.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.07);
-        osc.start(ac.currentTime);
-        osc.stop(ac.currentTime + 0.07);
+        osc.start(ac.currentTime); osc.stop(ac.currentTime + 0.07);
       } catch (e) {}
     }
 
@@ -236,21 +245,22 @@
           [587, 740, 880, 1175],
           [659, 831, 988, 1319],
           [784, 988, 1175, 1568],
+          [523, 659, 784, 1047, 1319],
+          [587, 740, 880, 1175, 1568],
+          [523, 659, 784, 1047, 1319, 1568],
         ];
-        const notes = melodies[tier] || melodies[0];
+        const notes = melodies[Math.min(tier, melodies.length - 1)];
         notes.forEach((freq, i) => {
           const osc = ac.createOscillator();
           const gain = ac.createGain();
-          osc.connect(gain);
-          gain.connect(ac.destination);
+          osc.connect(gain); gain.connect(ac.destination);
           osc.frequency.value = freq;
           osc.type = "sine";
           const t = ac.currentTime + i * 0.13;
           gain.gain.setValueAtTime(0, t);
           gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
           gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-          osc.start(t);
-          osc.stop(t + 0.28);
+          osc.start(t); osc.stop(t + 0.28);
         });
       } catch (e) {}
     }
@@ -273,6 +283,14 @@
         const end = start + arcSize;
         const tier = slots[i].tier;
         const shade = i % 2 === 0 ? tierColors[tier][0] : tierColors[tier][1];
+        const glow = tierGlow[tier];
+
+        // glow effect untuk slot langka
+        if (glow) {
+          ctx.save();
+          ctx.shadowColor = glow;
+          ctx.shadowBlur = 18;
+        }
 
         ctx.beginPath();
         ctx.moveTo(cx, cy);
@@ -280,16 +298,27 @@
         ctx.closePath();
         ctx.fillStyle = shade;
         ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.5)";
-        ctx.lineWidth = 1;
+
+        if (glow) ctx.restore();
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.strokeStyle = glow ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)";
+        ctx.lineWidth = glow ? 2 : 1;
         ctx.stroke();
 
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(start + arcSize / 2);
         ctx.textAlign = "right";
-        ctx.font = "600 10px 'Segoe UI', sans-serif";
-        ctx.fillStyle = tierText[tier];
+        ctx.font = glow ? "700 10px 'Segoe UI', sans-serif" : "600 10px 'Segoe UI', sans-serif";
+        ctx.fillStyle = glow ? "#fff" : tierText[tier];
+        if (glow) {
+          ctx.shadowColor = glow;
+          ctx.shadowBlur = 6;
+        }
         let label = slots[i].label;
         if (label.length > 20) label = label.substring(0, 19) + "…";
         ctx.fillText(label, r - 10, 4);
@@ -322,9 +351,7 @@
       return 0;
     }
 
-    function easeOut(t) {
-      return 1 - Math.pow(1 - t, 3);
-    }
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
 
     const btn = document.getElementById("spinBtn");
     const pointer = document.getElementById("pointer");
@@ -358,7 +385,6 @@
       if (delta < 0.3) delta += 2 * Math.PI;
 
       const totalDelta = delta + (8 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
-
       const duration = 7000;
       const startTime = performance.now();
       const startAngle = currentAngle;
