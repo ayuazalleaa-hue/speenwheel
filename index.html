@@ -134,42 +134,42 @@
     </div>
 
     <div class="result-box">
-      <div id="resultText">Tekan SPIN untuk mulai!</div>
+      <div id="resultText">Tekan SPIN untuk mulai</div>
       <div class="spin-count" id="spinCount">Sisa spin: 5</div>
     </div>
   </div>
 
   <script>
-    const rawSlots = [
-      { label: "Meowl Gold", tier: 0, chance: 3.446 },
-      { label: "Meowl Diamond", tier: 0, chance: 3.446 },
-      { label: "Meowl Plasma", tier: 0, chance: 3.446 },
-      { label: "Meowl Molten", tier: 0, chance: 3.446 },
-      { label: "Strawberry Ele Gold", tier: 0, chance: 3.446 },
-      { label: "Strawberry Ele Diamond", tier: 0, chance: 3.446 },
-      { label: "Strawberry Ele Plasma", tier: 0, chance: 3.446 },
-      { label: "Strawberry Ele Molten", tier: 0, chance: 3.446 },
-      { label: "Dolphin Gold", tier: 0, chance: 3.446 },
-      { label: "Dolphin Diamond", tier: 0, chance: 3.446 },
-      { label: "Dolphin Plasma", tier: 0, chance: 3.446 },
-      { label: "Dolphin Molten", tier: 0, chance: 3.446 },
-      { label: "Digitale Gold", tier: 0, chance: 3.446 },
-      { label: "Digitale Diamond", tier: 0, chance: 3.446 },
-      { label: "Digitale Plasma", tier: 0, chance: 3.446 },
-      { label: "Digitale Molten", tier: 0, chance: 3.446 },
-      { label: "Chicleteira Gold", tier: 0, chance: 3.446 },
-      { label: "Chicleteira Diamond", tier: 0, chance: 3.446 },
-      { label: "Chicleteira Plasma", tier: 0, chance: 3.446 },
-      { label: "Chicleteira Molten", tier: 0, chance: 3.446 },
-      { label: "Hotspot Gold", tier: 0, chance: 3.446 },
-      { label: "Hotspot Diamond", tier: 0, chance: 3.446 },
-      { label: "Hotspot Plasma", tier: 0, chance: 3.446 },
-      { label: "Hotspot Molten", tier: 0, chance: 3.446 },
-      { label: "Krupuk Gold", tier: 0, chance: 3.446 },
-      { label: "Krupuk Diamond", tier: 0, chance: 3.446 },
-      { label: "Krupuk Plasma", tier: 0, chance: 3.446 },
-      { label: "Krupuk Molten", tier: 0, chance: 3.446 },
-      { label: "Disc 1B/1.5K 8B/10K", tier: 1, chance: 2 },
+   const rawSlots = [
+      { label: "Meowl Gold", tier: 0, chance: 4.93 },
+      { label: "Meowl Diamond", tier: 1, chance: 4.43 },
+      { label: "Meowl Plasma", tier: 2, chance: 2.5 },
+      { label: "Meowl Molten", tier: 3, chance: 2 },
+      { label: "Strawberry Ele Gold", tier: 0, chance: 4.93 },
+      { label: "Strawberry Ele Diamond", tier: 1, chance: 4.43 },
+      { label: "Strawberry Ele Plasma", tier: 2, chance: 2.5 },
+      { label: "Strawberry Ele Molten", tier: 3, chance: 2 },
+      { label: "Dolphin Gold", tier: 0, chance: 4.93 },
+      { label: "Dolphin Diamond", tier: 1, chance: 4.43 },
+      { label: "Dolphin Plasma", tier: 2, chance: 2.5 },
+      { label: "Dolphin Molten", tier: 3, chance: 2 },
+      { label: "Digitale Gold", tier: 0, chance: 4.93 },
+      { label: "Digitale Diamond", tier: 1, chance: 4.43 },
+      { label: "Digitale Plasma", tier: 2, chance: 2.5 },
+      { label: "Digitale Molten", tier: 3, chance: 2 },
+      { label: "Chicleteira Gold", tier: 0, chance: 4.93 },
+      { label: "Chicleteira Diamond", tier: 1, chance: 4.43 },
+      { label: "Chicleteira Plasma", tier: 2, chance: 2.5 },
+      { label: "Chicleteira Molten", tier: 3, chance: 2 },
+      { label: "Hotspot Gold", tier: 0, chance: 4.93 },
+      { label: "Hotspot Diamond", tier: 1, chance: 4.43 },
+      { label: "Hotspot Plasma", tier: 2, chance: 2.5 },
+      { label: "Hotspot Molten", tier: 3, chance: 2 },
+      { label: "Krupuk Gold", tier: 0, chance: 4.93 },
+      { label: "Krupuk Diamond", tier: 1, chance: 4.43 },
+      { label: "Krupuk Plasma", tier: 2, chance: 2.5 },
+      { label: "Krupuk Molten", tier: 3, chance: 2 },
+      { label: "Disc 1B/1.5K 8B/10K", tier: 1, chance: 1.5 },
       { label: "Disc 1B/2K 8B/14K", tier: 2, chance: 1 },
       { label: "1 Lucky Block Cup", tier: 3, chance: 0.5 },
     ];
@@ -345,7 +345,7 @@
       if (spinning || remainingSpin <= 0) return;
       spinning = true;
       btn.disabled = true;
-      resultText.textContent = "Berputar...";
+      resultText.textContent = "Semoga beruntung";
       resultText.style.color = "rgba(255,255,255,0.4)";
       lastTickSlot = -1;
 
