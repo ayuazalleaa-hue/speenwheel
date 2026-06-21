@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spin Wheel</title>
+  <title>Subscribe Gratis 5x Spin</title>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -108,14 +108,6 @@
       min-width: 320px;
     }
 
-    .result-label {
-      font-size: 12px;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
     #resultText {
       font-size: 18px;
       font-weight: 600;
@@ -128,17 +120,11 @@
       color: rgba(255,255,255,0.3);
       margin-top: 6px;
     }
-
-    footer {
-      font-size: 12px;
-      color: rgba(255,255,255,0.2);
-      margin-top: 1rem;
-    }
   </style>
 </head>
 <body>
 
-  <h1>🎰 Spin <span>Wheel</span></h1>
+  <h1>🎰 Subscribe Gratis <span>5x Spin</span></h1>
 
   <div class="wheel-section">
     <div class="wheel-wrap">
@@ -148,13 +134,10 @@
     </div>
 
     <div class="result-box">
-      <div class="result-label">Hasil Spin</div>
       <div id="resultText">Tekan SPIN untuk mulai!</div>
-      <div class="spin-count" id="spinCount">Total spin: 0</div>
+      <div class="spin-count" id="spinCount">Sisa spin: 5</div>
     </div>
   </div>
-
-  <footer>Spin wheel — Good luck! 🍀</footer>
 
   <script>
     const rawSlots = [
@@ -221,7 +204,7 @@
     let currentAngle = 0;
     let spinning = false;
     let lastTickSlot = -1;
-    let totalSpins = 0;
+    let remainingSpin = 5;
 
     let audioCtx = null;
     function getAudio() {
@@ -280,7 +263,6 @@
     function drawWheel(angle) {
       ctx.clearRect(0, 0, SIZE, SIZE);
 
-      // shadow ring
       ctx.beginPath();
       ctx.arc(cx, cy, r + 4, 0, 2 * Math.PI);
       ctx.fillStyle = "rgba(0,0,0,0.4)";
@@ -314,14 +296,12 @@
         ctx.restore();
       }
 
-      // outer border
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, 2 * Math.PI);
       ctx.strokeStyle = "rgba(255,255,255,0.15)";
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // center circle
       ctx.beginPath();
       ctx.arc(cx, cy, 42, 0, 2 * Math.PI);
       ctx.fillStyle = "#fff";
@@ -351,8 +331,18 @@
     const resultText = document.getElementById("resultText");
     const spinCount = document.getElementById("spinCount");
 
+    function updateSpinCount() {
+      spinCount.textContent = "Sisa spin: " + remainingSpin;
+      if (remainingSpin === 0) {
+        spinCount.textContent = "Spin habis! Refresh untuk reset.";
+        spinCount.style.color = "#e24b4a";
+        btn.disabled = true;
+        btn.textContent = "HABIS";
+      }
+    }
+
     btn.addEventListener("click", () => {
-      if (spinning) return;
+      if (spinning || remainingSpin <= 0) return;
       spinning = true;
       btn.disabled = true;
       resultText.textContent = "Berputar...";
@@ -380,7 +370,6 @@
         const eased = easeOut(t);
 
         currentAngle = startAngle + totalDelta * eased;
-
         const speed = Math.abs(currentAngle - prevAngle);
         prevAngle = currentAngle;
 
@@ -400,9 +389,9 @@
           currentAngle = (startAngle + totalDelta) % (2 * Math.PI);
           drawWheel(currentAngle);
           spinning = false;
-          btn.disabled = false;
-          totalSpins++;
-          spinCount.textContent = "Total spin: " + totalSpins;
+          remainingSpin--;
+          updateSpinCount();
+          if (remainingSpin > 0) btn.disabled = false;
           playWin(slots[winSlot].tier);
           resultText.textContent = "🎉 " + slots[winSlot].label;
           resultText.style.color = tierResultColor[slots[winSlot].tier];
@@ -413,6 +402,7 @@
     });
 
     drawWheel(currentAngle);
+    updateSpinCount();
   </script>
 </body>
 </html>
