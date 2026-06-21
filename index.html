@@ -11,12 +11,29 @@
       min-height: 100vh;
       background: #0f0f1a;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       font-family: 'Segoe UI', sans-serif;
       padding: 2rem 1rem;
+      overflow-x: auto;
+    }
+
+    .page {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: nowrap;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .main-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 2rem;
+      flex-shrink: 0;
     }
 
     h1 {
@@ -112,21 +129,134 @@
       color: rgba(255,255,255,0.3);
       margin-top: 6px;
     }
+
+    /* History panel */
+    .history-panel {
+      width: 260px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 1.2rem 1.2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      max-height: 600px;
+    }
+
+    .history-panel h2 {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .history-panel h2 span { color: #EF9F27; }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.6rem 0.8rem;
+      animation: slideIn 0.35s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .history-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .history-label {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .history-empty {
+      text-align: center;
+      color: rgba(255,255,255,0.25);
+      font-size: 13px;
+      padding: 1.5rem 0;
+    }
+
+    .history-divider {
+      border-top: 1px dashed rgba(255,255,255,0.15);
+      margin: 0.2rem 0;
+      position: relative;
+      text-align: center;
+    }
+
+    .history-divider span {
+      position: relative;
+      top: -9px;
+      background: #16162a;
+      padding: 0 8px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 860px) {
+      .page { flex-wrap: wrap; justify-content: center; }
+      .history-panel { width: 420px; max-width: 90vw; }
+    }
+    @media (max-width: 480px) {
+      .history-panel { width: 320px; }
+    }
   </style>
 </head>
 <body>
 
-  <h1>🎰 Subscribe Gratis <span>5x Spin</span></h1>
+  <div class="page">
+    <div class="main-col">
+      <h1>Subscribe Gratis <span>5x Spin</span></h1>
 
-  <div class="wheel-section">
-    <div class="wheel-wrap">
-      <div class="pointer" id="pointer"></div>
-      <canvas id="wheel" width="420" height="420"></canvas>
-      <button class="spin-btn" id="spinBtn">SPIN</button>
+      <div class="wheel-section">
+        <div class="wheel-wrap">
+          <div class="pointer" id="pointer"></div>
+          <canvas id="wheel" width="420" height="420"></canvas>
+          <button class="spin-btn" id="spinBtn">SPIN</button>
+        </div>
+        <div class="result-box">
+          <div id="resultText">Tekan SPIN untuk mulai</div>
+          <div class="spin-count" id="spinCount">Sisa spin: 5</div>
+        </div>
+      </div>
     </div>
-    <div class="result-box">
-      <div id="resultText">Tekan SPIN untuk mulai</div>
-      <div class="spin-count" id="spinCount">Sisa spin: 5</div>
+
+    <div class="history-panel">
+      <h2>Hasil <span>Spin</span></h2>
+      <div class="history-list" id="historyList">
+        <div class="history-empty" id="historyEmpty">Belum ada riwayat spin</div>
+      </div>
     </div>
   </div>
 
@@ -216,6 +346,11 @@
     let spinning = false;
     let lastTickSlot = -1;
     let remainingSpin = 5;
+    const MAX_SPIN = 5;
+    let needsHistoryClear = false; // true setelah round 5 spin selesai, history baru dihapus saat klik spin berikutnya
+
+    // riwayat round saat ini, di-reset total tiap mulai round baru
+    let roundHistory = [];
 
     let audioCtx = null;
     function getAudio() {
@@ -357,24 +492,46 @@
     const pointer = document.getElementById("pointer");
     const resultText = document.getElementById("resultText");
     const spinCount = document.getElementById("spinCount");
+    const historyList = document.getElementById("historyList");
+    const historyEmpty = document.getElementById("historyEmpty");
 
     function updateSpinCount() {
       spinCount.textContent = "Sisa spin: " + remainingSpin;
-      if (remainingSpin === 0) {
-        spinCount.textContent = "Spin habis! Refresh untuk reset.";
-        spinCount.style.color = "#e24b4a";
-        btn.disabled = true;
-        btn.textContent = "HABIS";
-      }
+      spinCount.style.color = "rgba(255,255,255,0.3)";
+    }
+
+    // kosongkan total panel history (dipanggil tiap mulai round baru)
+    function clearHistoryPanel() {
+      historyList.innerHTML = '<div class="history-empty" id="historyEmpty">Belum ada riwayat spin</div>';
+    }
+
+    // tambah 1 entri ke history panel, urut natural: spin 1 di atas, spin terbaru di bawah
+    function addHistoryEntry(slot, spinIndexInRound) {
+      const emptyEl = document.getElementById("historyEmpty");
+      if (emptyEl) emptyEl.remove();
+
+      const item = document.createElement("div");
+      item.className = "history-item";
+      item.style.borderLeft = `3px solid ${tierResultColor[slot.tier]}`;
+      item.innerHTML = `
+        <div class="history-num">${spinIndexInRound}</div>
+        <div class="history-label" style="color:${tierResultColor[slot.tier]}">${slot.label}</div>
+      `;
+      historyList.appendChild(item);
     }
 
     btn.addEventListener("click", () => {
-      if (spinning || remainingSpin <= 0) return;
+      if (spinning) return;
       spinning = true;
       btn.disabled = true;
       resultText.textContent = "Semoga beruntung";
       resultText.style.color = "rgba(255,255,255,0.4)";
       lastTickSlot = -1;
+
+      if (needsHistoryClear) {
+        clearHistoryPanel();
+        needsHistoryClear = false;
+      }
 
       const winSlot = pickResult();
       const slotCenter = winSlot * arcSize + arcSize / 2;
@@ -415,12 +572,29 @@
           currentAngle = (startAngle + totalDelta) % (2 * Math.PI);
           drawWheel(currentAngle);
           spinning = false;
+
           remainingSpin--;
-          updateSpinCount();
-          if (remainingSpin > 0) btn.disabled = false;
+          const spinIndexInRound = MAX_SPIN - remainingSpin; // 1..5
+          roundHistory.push(slots[winSlot]);
+
           playWin(slots[winSlot].tier);
           resultText.textContent = "🎉 " + slots[winSlot].label;
           resultText.style.color = tierResultColor[slots[winSlot].tier];
+
+          addHistoryEntry(slots[winSlot], spinIndexInRound);
+
+          if (remainingSpin <= 0) {
+            // habis 5x spin -> kembalikan jadi 5 tanpa refresh, history TETAP tampil
+            // sampai user klik spin lagi (spin ke-6), baru dihapus
+            remainingSpin = MAX_SPIN;
+            roundHistory = [];
+            needsHistoryClear = true;
+            updateSpinCount();
+            btn.disabled = false;
+          } else {
+            btn.disabled = false;
+            updateSpinCount();
+          }
         }
       }
 
