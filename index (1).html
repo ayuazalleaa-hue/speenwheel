@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin Wheel</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #0f0f1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem 1rem;
+      gap: 2rem;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    h1 span {
+      color: #EF9F27;
+    }
+
+    .wheel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: 420px;
+      height: 420px;
+    }
+
+    @media (max-width: 480px) {
+      .wheel-wrap { width: 320px; height: 320px; }
+      canvas { width: 320px !important; height: 320px !important; }
+    }
+
+    .pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 34px solid #e24b4a;
+      z-index: 20;
+      filter: drop-shadow(0 2px 6px rgba(226,75,74,0.6));
+      transition: border-top-color 0.05s;
+    }
+
+    .spin-btn {
+      position: absolute;
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      background: #fff;
+      border: 5px solid #111;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      letter-spacing: 1px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    .spin-btn:active:not(:disabled) {
+      transform: translate(-50%, -50%) scale(0.97);
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 1.2rem 2.5rem;
+      text-align: center;
+      min-width: 320px;
+    }
+
+    .result-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    #resultText {
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      transition: color 0.3s;
+    }
+
+    .spin-count {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 6px;
+    }
+
+    footer {
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎰 Spin <span>Wheel</span></h1>
+
+  <div class="wheel-section">
+    <div class="wheel-wrap">
+      <div class="pointer" id="pointer"></div>
+      <canvas id="wheel" width="420" height="420"></canvas>
+      <button class="spin-btn" id="spinBtn">SPIN</button>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">Hasil Spin</div>
+      <div id="resultText">Tekan SPIN untuk mulai!</div>
+      <div class="spin-count" id="spinCount">Total spin: 0</div>
+    </div>
+  </div>
+
+  <footer>Spin wheel — Good luck! 🍀</footer>
+
+  <script>
+    const rawSlots = [
+      { label: "Meowl Gold", tier: 0, chance: 3.446 },
+      { label: "Meowl Diamond", tier: 0, chance: 3.446 },
+      { label: "Meowl Plasma", tier: 0, chance: 3.446 },
+      { label: "Meowl Molten", tier: 0, chance: 3.446 },
+      { label: "Strawberry Ele Gold", tier: 0, chance: 3.446 },
+      { label: "Strawberry Ele Diamond", tier: 0, chance: 3.446 },
+      { label: "Strawberry Ele Plasma", tier: 0, chance: 3.446 },
+      { label: "Strawberry Ele Molten", tier: 0, chance: 3.446 },
+      { label: "Dolphin Gold", tier: 0, chance: 3.446 },
+      { label: "Dolphin Diamond", tier: 0, chance: 3.446 },
+      { label: "Dolphin Plasma", tier: 0, chance: 3.446 },
+      { label: "Dolphin Molten", tier: 0, chance: 3.446 },
+      { label: "Digitale Gold", tier: 0, chance: 3.446 },
+      { label: "Digitale Diamond", tier: 0, chance: 3.446 },
+      { label: "Digitale Plasma", tier: 0, chance: 3.446 },
+      { label: "Digitale Molten", tier: 0, chance: 3.446 },
+      { label: "Chicleteira Gold", tier: 0, chance: 3.446 },
+      { label: "Chicleteira Diamond", tier: 0, chance: 3.446 },
+      { label: "Chicleteira Plasma", tier: 0, chance: 3.446 },
+      { label: "Chicleteira Molten", tier: 0, chance: 3.446 },
+      { label: "Hotspot Gold", tier: 0, chance: 3.446 },
+      { label: "Hotspot Diamond", tier: 0, chance: 3.446 },
+      { label: "Hotspot Plasma", tier: 0, chance: 3.446 },
+      { label: "Hotspot Molten", tier: 0, chance: 3.446 },
+      { label: "Krupuk Gold", tier: 0, chance: 3.446 },
+      { label: "Krupuk Diamond", tier: 0, chance: 3.446 },
+      { label: "Krupuk Plasma", tier: 0, chance: 3.446 },
+      { label: "Krupuk Molten", tier: 0, chance: 3.446 },
+      { label: "Disc 1B/1.5K 8B/10K", tier: 1, chance: 2 },
+      { label: "Disc 1B/2K 8B/14K", tier: 2, chance: 1 },
+      { label: "1 Lucky Block Cup", tier: 3, chance: 0.5 },
+    ];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    const slots = shuffle(rawSlots);
+    const N = slots.length;
+    const arcSize = (2 * Math.PI) / N;
+
+    const tierColors = [
+      ["#5DCAA5", "#1D9E75"],
+      ["#378ADD", "#185FA5"],
+      ["#D4537E", "#993556"],
+      ["#EF9F27", "#BA7517"],
+    ];
+    const tierText = ["#04342C", "#042C53", "#4B1528", "#412402"];
+    const tierResultColor = ["#5DCAA5", "#378ADD", "#D4537E", "#EF9F27"];
+
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const SIZE = canvas.width;
+    const cx = SIZE / 2, cy = SIZE / 2, r = SIZE / 2 - 5;
+
+    let currentAngle = 0;
+    let spinning = false;
+    let lastTickSlot = -1;
+    let totalSpins = 0;
+
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function playTick(speed) {
+      try {
+        const ac = getAudio();
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.frequency.value = 280 + Math.min(speed * 900, 900);
+        osc.type = "triangle";
+        gain.gain.setValueAtTime(0.15, ac.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.07);
+        osc.start(ac.currentTime);
+        osc.stop(ac.currentTime + 0.07);
+      } catch (e) {}
+    }
+
+    function playWin(tier) {
+      try {
+        const ac = getAudio();
+        const melodies = [
+          [523, 659, 784, 1047],
+          [587, 740, 880, 1175],
+          [659, 831, 988, 1319],
+          [784, 988, 1175, 1568],
+        ];
+        const notes = melodies[tier] || melodies[0];
+        notes.forEach((freq, i) => {
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.frequency.value = freq;
+          osc.type = "sine";
+          const t = ac.currentTime + i * 0.13;
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+          osc.start(t);
+          osc.stop(t + 0.28);
+        });
+      } catch (e) {}
+    }
+
+    function getSlotAtPointer(angle) {
+      const norm = ((-Math.PI / 2 - angle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+      return Math.floor(norm / arcSize) % N;
+    }
+
+    function drawWheel(angle) {
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      // shadow ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 4, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.fill();
+
+      for (let i = 0; i < N; i++) {
+        const start = angle + i * arcSize;
+        const end = start + arcSize;
+        const tier = slots[i].tier;
+        const shade = i % 2 === 0 ? tierColors[tier][0] : tierColors[tier][1];
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.fillStyle = shade;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.5)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.font = "600 10px 'Segoe UI', sans-serif";
+        ctx.fillStyle = tierText[tier];
+        let label = slots[i].label;
+        if (label.length > 20) label = label.substring(0, 19) + "…";
+        ctx.fillText(label, r - 10, 4);
+        ctx.restore();
+      }
+
+      // outer border
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // center circle
+      ctx.beginPath();
+      ctx.arc(cx, cy, 42, 0, 2 * Math.PI);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+      ctx.strokeStyle = "#111";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+
+    function pickResult() {
+      const total = slots.reduce((a, b) => a + b.chance, 0);
+      const rand = Math.random() * total;
+      let cum = 0;
+      for (let i = 0; i < N; i++) {
+        cum += slots[i].chance;
+        if (rand < cum) return i;
+      }
+      return 0;
+    }
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    const btn = document.getElementById("spinBtn");
+    const pointer = document.getElementById("pointer");
+    const resultText = document.getElementById("resultText");
+    const spinCount = document.getElementById("spinCount");
+
+    btn.addEventListener("click", () => {
+      if (spinning) return;
+      spinning = true;
+      btn.disabled = true;
+      resultText.textContent = "Berputar...";
+      resultText.style.color = "rgba(255,255,255,0.4)";
+      lastTickSlot = -1;
+
+      const winSlot = pickResult();
+      const slotCenter = winSlot * arcSize + arcSize / 2;
+      const target = -Math.PI / 2 - slotCenter;
+
+      let delta = target - currentAngle;
+      delta = ((delta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      if (delta < 0.3) delta += 2 * Math.PI;
+
+      const totalDelta = delta + (8 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
+
+      const duration = 7000;
+      const startTime = performance.now();
+      const startAngle = currentAngle;
+      let prevAngle = startAngle;
+
+      function animate(now) {
+        const elapsed = Math.min(now - startTime, duration);
+        const t = elapsed / duration;
+        const eased = easeOut(t);
+
+        currentAngle = startAngle + totalDelta * eased;
+
+        const speed = Math.abs(currentAngle - prevAngle);
+        prevAngle = currentAngle;
+
+        drawWheel(currentAngle);
+
+        const cur = getSlotAtPointer(currentAngle);
+        if (cur !== lastTickSlot) {
+          lastTickSlot = cur;
+          playTick(speed);
+          pointer.style.borderTopColor = "#ff6b35";
+          setTimeout(() => { pointer.style.borderTopColor = "#e24b4a"; }, 60);
+        }
+
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          currentAngle = (startAngle + totalDelta) % (2 * Math.PI);
+          drawWheel(currentAngle);
+          spinning = false;
+          btn.disabled = false;
+          totalSpins++;
+          spinCount.textContent = "Total spin: " + totalSpins;
+          playWin(slots[winSlot].tier);
+          resultText.textContent = "🎉 " + slots[winSlot].label;
+          resultText.style.color = tierResultColor[slots[winSlot].tier];
+        }
+      }
+
+      requestAnimationFrame(animate);
+    });
+
+    drawWheel(currentAngle);
+  </script>
+</body>
+</html>
