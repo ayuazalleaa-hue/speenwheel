@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscribe Gratis 3x Spin</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #0f0f1a;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem 1rem;
+      overflow-x: auto;
+    }
+
+    .page {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: nowrap;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .main-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    h1 span { color: #EF9F27; }
+
+    .wheel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: 420px;
+      height: 420px;
+    }
+
+    @media (max-width: 480px) {
+      .wheel-wrap { width: 320px; height: 320px; }
+      canvas { width: 320px !important; height: 320px !important; }
+    }
+
+    .pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 34px solid #e24b4a;
+      z-index: 20;
+      filter: drop-shadow(0 2px 6px rgba(226,75,74,0.6));
+      transition: border-top-color 0.05s;
+    }
+
+    .spin-btn {
+      position: absolute;
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      background: #fff;
+      border: 5px solid #111;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      letter-spacing: 1px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    .spin-btn:active:not(:disabled) { transform: translate(-50%, -50%) scale(0.97); }
+    .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 1.2rem 2.5rem;
+      text-align: center;
+      min-width: 320px;
+    }
+
+    #resultText {
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      transition: color 0.3s;
+    }
+
+    .spin-count {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 6px;
+    }
+
+    /* History panel */
+    .history-panel {
+      width: 260px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 1.2rem 1.2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      max-height: 280px;
+    }
+
+    .history-panel h2 {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .history-panel h2 span { color: #EF9F27; }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.6rem 0.8rem;
+      animation: slideIn 0.35s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .history-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .history-label {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .history-empty {
+      text-align: center;
+      color: rgba(255,255,255,0.25);
+      font-size: 13px;
+      padding: 1.5rem 0;
+    }
+
+    .history-divider {
+      border-top: 1px dashed rgba(255,255,255,0.15);
+      margin: 0.2rem 0;
+      position: relative;
+      text-align: center;
+    }
+
+    .history-divider span {
+      position: relative;
+      top: -9px;
+      background: #16162a;
+      padding: 0 8px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 860px) {
+      .page { flex-wrap: wrap; justify-content: center; }
+      .history-panel { width: 420px; max-width: 90vw; max-height: 260px; }
+    }
+    @media (max-width: 480px) {
+      .history-panel { width: 320px; max-height: 240px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+    <div class="main-col">
+      <h1>Subscribe Gratis <span>3x Spin</span></h1>
+
+      <div class="wheel-section">
+        <div class="wheel-wrap">
+          <div class="pointer" id="pointer"></div>
+          <canvas id="wheel" width="420" height="420"></canvas>
+          <button class="spin-btn" id="spinBtn">SPIN</button>
+        </div>
+        <div class="result-box">
+          <div id="resultText">Tekan SPIN untuk mulai</div>
+          <div class="spin-count" id="spinCount">Sisa spin: 3</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-panel">
+      <h2>Hasil <span>Spin</span></h2>
+      <div class="history-list" id="historyList">
+        <div class="history-empty" id="historyEmpty">Belum ada riwayat spin</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const rawSlots = [
+      { label: "Meowl Gold",            tier: 0, chance: 4.93 },
+      { label: "Meowl Diamond",         tier: 1, chance: 4.43 },
+      { label: "Meowl Plasma",          tier: 2, chance: 2.5  },
+      { label: "Meowl Molten",          tier: 3, chance: 2    },
+      { label: "Strawberry Ele Gold",   tier: 0, chance: 4.93 },
+      { label: "Strawberry Ele Diamond",tier: 1, chance: 4.43 },
+      { label: "Strawberry Ele Plasma", tier: 2, chance: 2.5  },
+      { label: "Strawberry Ele Molten", tier: 3, chance: 2    },
+      { label: "Dolphin Gold",          tier: 0, chance: 4.93 },
+      { label: "Dolphin Diamond",       tier: 1, chance: 4.43 },
+      { label: "Dolphin Plasma",        tier: 2, chance: 2.5  },
+      { label: "Dolphin Molten",        tier: 3, chance: 2    },
+      { label: "Digitale Gold",         tier: 0, chance: 4.93 },
+      { label: "Digitale Diamond",      tier: 1, chance: 4.43 },
+      { label: "Digitale Plasma",       tier: 2, chance: 2.5  },
+      { label: "Digitale Molten",       tier: 3, chance: 2    },
+      { label: "Chicleteira Gold",      tier: 0, chance: 4.93 },
+      { label: "Chicleteira Diamond",   tier: 1, chance: 4.43 },
+      { label: "Chicleteira Plasma",    tier: 2, chance: 2.5  },
+      { label: "Chicleteira Molten",    tier: 3, chance: 2    },
+      { label: "Hotspot Gold",          tier: 0, chance: 4.93 },
+      { label: "Hotspot Diamond",       tier: 1, chance: 4.43 },
+      { label: "Hotspot Plasma",        tier: 2, chance: 2.5  },
+      { label: "Hotspot Molten",        tier: 3, chance: 2    },
+      { label: "Krupuk Gold",           tier: 0, chance: 4.93 },
+      { label: "Krupuk Diamond",        tier: 1, chance: 4.43 },
+      { label: "Krupuk Plasma",         tier: 2, chance: 2.5  },
+      { label: "Krupuk Molten",         tier: 3, chance: 2    },
+      { label: "Disc 1B/1.5K 8B/10K",  tier: 4, chance: 1.5  },
+      { label: "Disc 1B/2K 8B/14K",    tier: 5, chance: 1    },
+      { label: "1 Lucky Block Cup",     tier: 6, chance: 0.5  },
+    ];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    const slots = shuffle(rawSlots);
+    const N = slots.length;
+    const arcSize = (2 * Math.PI) / N;
+
+    // tier 0=Gold, 1=Diamond, 2=Plasma, 3=Molten, 4=Disc murah, 5=Disc mahal, 6=Lucky Block
+    const tierColors = [
+      ["#5DCAA5", "#1D9E75"],         // Gold - hijau
+      ["#378ADD", "#185FA5"],         // Diamond - biru
+      ["#D4537E", "#993556"],         // Plasma - pink
+      ["#EF9F27", "#BA7517"],         // Molten - amber
+      ["#00E5FF", "#00ACC1"],         // Disc murah - cyan terang
+      ["#CE93D8", "#9C27B0"],         // Disc mahal - ungu terang
+      ["#FFD700", "#FF8C00"],         // Lucky Block - emas
+    ];
+
+    const tierText = [
+      "#04342C", "#042C53", "#4B1528", "#412402",
+      "#001F26", "#1A0030", "#3B2000",
+    ];
+
+    const tierResultColor = [
+      "#5DCAA5", "#378ADD", "#D4537E", "#EF9F27",
+      "#00E5FF", "#CE93D8", "#FFD700",
+    ];
+
+    // glow color per tier (hanya tier 4,5,6)
+    const tierGlow = [
+      null, null, null, null,
+      "rgba(0,229,255,0.7)",
+      "rgba(206,147,216,0.8)",
+      "rgba(255,215,0,0.9)",
+    ];
+
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const SIZE = canvas.width;
+    const cx = SIZE / 2, cy = SIZE / 2, r = SIZE / 2 - 5;
+
+    let currentAngle = 0;
+    let spinning = false;
+    let lastTickSlot = -1;
+    let remainingSpin = 3;
+    const MAX_SPIN = 3;
+    let needsHistoryClear = false; // true setelah round 5 spin selesai, history baru dihapus saat klik spin berikutnya
+
+    // riwayat round saat ini, di-reset total tiap mulai round baru
+    let roundHistory = [];
+
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function playTick(speed) {
+      try {
+        const ac = getAudio();
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.connect(gain); gain.connect(ac.destination);
+        osc.frequency.value = 280 + Math.min(speed * 900, 900);
+        osc.type = "triangle";
+        gain.gain.setValueAtTime(0.15, ac.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.07);
+        osc.start(ac.currentTime); osc.stop(ac.currentTime + 0.07);
+      } catch (e) {}
+    }
+
+    function playWin(tier) {
+      try {
+        const ac = getAudio();
+        const melodies = [
+          [523, 659, 784, 1047],
+          [587, 740, 880, 1175],
+          [659, 831, 988, 1319],
+          [784, 988, 1175, 1568],
+          [523, 659, 784, 1047, 1319],
+          [587, 740, 880, 1175, 1568],
+          [523, 659, 784, 1047, 1319, 1568],
+        ];
+        const notes = melodies[Math.min(tier, melodies.length - 1)];
+        notes.forEach((freq, i) => {
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.connect(gain); gain.connect(ac.destination);
+          osc.frequency.value = freq;
+          osc.type = "sine";
+          const t = ac.currentTime + i * 0.13;
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+          osc.start(t); osc.stop(t + 0.28);
+        });
+      } catch (e) {}
+    }
+
+    function getSlotAtPointer(angle) {
+      const norm = ((-Math.PI / 2 - angle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+      return Math.floor(norm / arcSize) % N;
+    }
+
+    function drawWheel(angle) {
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 4, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.fill();
+
+      for (let i = 0; i < N; i++) {
+        const start = angle + i * arcSize;
+        const end = start + arcSize;
+        const tier = slots[i].tier;
+        const shade = i % 2 === 0 ? tierColors[tier][0] : tierColors[tier][1];
+        const glow = tierGlow[tier];
+
+        // glow effect untuk slot langka
+        if (glow) {
+          ctx.save();
+          ctx.shadowColor = glow;
+          ctx.shadowBlur = 18;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.fillStyle = shade;
+        ctx.fill();
+
+        if (glow) ctx.restore();
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.strokeStyle = glow ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)";
+        ctx.lineWidth = glow ? 2 : 1;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.font = glow ? "700 10px 'Segoe UI', sans-serif" : "600 10px 'Segoe UI', sans-serif";
+        ctx.fillStyle = glow ? "#fff" : tierText[tier];
+        if (glow) {
+          ctx.shadowColor = glow;
+          ctx.shadowBlur = 6;
+        }
+        let label = slots[i].label;
+        if (label.length > 20) label = label.substring(0, 19) + "…";
+        ctx.fillText(label, r - 10, 4);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 42, 0, 2 * Math.PI);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+      ctx.strokeStyle = "#111";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+
+    function pickResult() {
+      const total = slots.reduce((a, b) => a + b.chance, 0);
+      const rand = Math.random() * total;
+      let cum = 0;
+      for (let i = 0; i < N; i++) {
+        cum += slots[i].chance;
+        if (rand < cum) return i;
+      }
+      return 0;
+    }
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    const btn = document.getElementById("spinBtn");
+    const pointer = document.getElementById("pointer");
+    const resultText = document.getElementById("resultText");
+    const spinCount = document.getElementById("spinCount");
+    const historyList = document.getElementById("historyList");
+    const historyEmpty = document.getElementById("historyEmpty");
+
+    function updateSpinCount() {
+      spinCount.textContent = "Sisa spin: " + remainingSpin;
+      spinCount.style.color = "rgba(255,255,255,0.3)";
+    }
+
+    // kosongkan total panel history (dipanggil tiap mulai round baru)
+    function clearHistoryPanel() {
+      historyList.innerHTML = '<div class="history-empty" id="historyEmpty">Belum ada riwayat spin</div>';
+    }
+
+    // tambah 1 entri ke history panel, urut natural: spin 1 di atas, spin terbaru di bawah
+    function addHistoryEntry(slot, spinIndexInRound) {
+      const emptyEl = document.getElementById("historyEmpty");
+      if (emptyEl) emptyEl.remove();
+
+      const item = document.createElement("div");
+      item.className = "history-item";
+      item.style.borderLeft = `3px solid ${tierResultColor[slot.tier]}`;
+      item.innerHTML = `
+        <div class="history-num">${spinIndexInRound}</div>
+        <div class="history-label" style="color:${tierResultColor[slot.tier]}">${slot.label}</div>
+      `;
+      historyList.appendChild(item);
+    }
+
+    btn.addEventListener("click", () => {
+      if (spinning) return;
+      spinning = true;
+      btn.disabled = true;
+      resultText.textContent = "Semoga beruntung";
+      resultText.style.color = "rgba(255,255,255,0.4)";
+      lastTickSlot = -1;
+
+      if (needsHistoryClear) {
+        clearHistoryPanel();
+        needsHistoryClear = false;
+      }
+
+      const winSlot = pickResult();
+      const slotCenter = winSlot * arcSize + arcSize / 2;
+      const target = -Math.PI / 2 - slotCenter;
+
+      let delta = target - currentAngle;
+      delta = ((delta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      if (delta < 0.3) delta += 2 * Math.PI;
+
+      const totalDelta = delta + (8 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
+      const duration = 7000;
+      const startTime = performance.now();
+      const startAngle = currentAngle;
+      let prevAngle = startAngle;
+
+      function animate(now) {
+        const elapsed = Math.min(now - startTime, duration);
+        const t = elapsed / duration;
+        const eased = easeOut(t);
+
+        currentAngle = startAngle + totalDelta * eased;
+        const speed = Math.abs(currentAngle - prevAngle);
+        prevAngle = currentAngle;
+
+        drawWheel(currentAngle);
+
+        const cur = getSlotAtPointer(currentAngle);
+        if (cur !== lastTickSlot) {
+          lastTickSlot = cur;
+          playTick(speed);
+          pointer.style.borderTopColor = "#ff6b35";
+          setTimeout(() => { pointer.style.borderTopColor = "#e24b4a"; }, 60);
+        }
+
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          currentAngle = (startAngle + totalDelta) % (2 * Math.PI);
+          drawWheel(currentAngle);
+          spinning = false;
+
+          remainingSpin--;
+          const spinIndexInRound = MAX_SPIN - remainingSpin; // 1..5
+          roundHistory.push(slots[winSlot]);
+
+          playWin(slots[winSlot].tier);
+          resultText.textContent = "🎉 " + slots[winSlot].label;
+          resultText.style.color = tierResultColor[slots[winSlot].tier];
+
+          addHistoryEntry(slots[winSlot], spinIndexInRound);
+
+          if (remainingSpin <= 0) {
+            // habis 5x spin -> kembalikan jadi 5 tanpa refresh, history TETAP tampil
+            // sampai user klik spin lagi (spin ke-6), baru dihapus
+            remainingSpin = MAX_SPIN;
+            roundHistory = [];
+            needsHistoryClear = true;
+            updateSpinCount();
+            btn.disabled = false;
+          } else {
+            btn.disabled = false;
+            updateSpinCount();
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    });
+
+    drawWheel(currentAngle);
+    updateSpinCount();
+  </script>
+</body>
+</html>
